@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="description" content="AI Hành Chính — Trợ lý thông minh cho Thư ký & Trợ lý Giám đốc. Tạo biên bản họp, thông báo, lịch công tác chuẩn thể thức trong 2 phút."/>
+  <meta name="keywords" content="AI thư ký, tạo biên bản họp, AI hành chính, thư ký giám đốc, trợ lý văn phòng"/>
+  <title>AI Hành Chính — Trợ lý Thông minh cho Thư ký & Trợ lý Giám đốc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ══════════════════════════════════════════
+       RESET & ROOT
+    ══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --pink:    #ec4899;
+      --purple:  #8b5cf6;
+      --indigo:  #6366f1;
+      --blue:    #3b82f6;
+      --teal:    #14b8a6;
+      --amber:   #f59e0b;
+      --green:   #22c55e;
+      --red:     #ef4444;
+      --dark:    #0f0a1e;
+      --dark2:   #1a1040;
+      --text:    #1e293b;
+      --muted:   #64748b;
+      --white:   #ffffff;
+      --border:  #e2e8f0;
+      --bg:      #faf5ff;
+
+      --grad-hero: linear-gradient(135deg, #0f0a1e 0%, #1a1040 40%, #2d1b69 100%);
+      --grad-card: linear-gradient(135deg, #f8f4ff, #ffffff);
+      --grad-cta:  linear-gradient(135deg, #ec4899, #8b5cf6, #6366f1);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body  {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
+
+    /* ══════════════════════════════════════════
+       ANIMATIONS
+    ══════════════════════════════════════════ */
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(32px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+    @keyframes float    { 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-18px) rotate(3deg); } }
+    @keyframes float2   { 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-12px) rotate(-4deg); } }
+    @keyframes pulse    { 0%,100%{ box-shadow:0 0 0 0 rgba(139,92,246,.5); } 70%{ box-shadow:0 0 0 14px rgba(139,92,246,0); } }
+    @keyframes shimmer  { 0%{ background-position:-400px 0; } 100%{ background-position:400px 0; } }
+    @keyframes gradMove { 0%,100%{ background-position:0% 50%; } 50%{ background-position:100% 50%; } }
+    @keyframes spin     { to { transform:rotate(360deg); } }
+    @keyframes blink    { 0%,100%{ opacity:1; } 50%{ opacity:0; } }
+    @keyframes slideInLeft  { from { opacity:0; transform:translateX(-40px); } to { opacity:1; transform:translateX(0); } }
+    @keyframes slideInRight { from { opacity:0; transform:translateX(40px);  } to { opacity:1; transform:translateX(0); } }
+    @keyframes scaleIn  { from { opacity:0; transform:scale(.8); } to { opacity:1; transform:scale(1); } }
+    @keyframes glow     { 0%,100%{ filter:drop-shadow(0 0 8px rgba(236,72,153,.4)); } 50%{ filter:drop-shadow(0 0 24px rgba(139,92,246,.7)); } }
+    @keyframes orbit    { from{ transform:rotate(0deg) translateX(90px) rotate(0deg); } to{ transform:rotate(360deg) translateX(90px) rotate(-360deg); } }
+    @keyframes tickerScroll { 0%{ transform:translateX(0); } 100%{ transform:translateX(-50%); } }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity:0; transform:translateY(30px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-left  { opacity:0; transform:translateX(-30px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal-left.visible  { opacity:1; transform:translateX(0); }
+    .reveal-right { opacity:0; transform:translateX(30px);  transition: opacity .7s ease, transform .7s ease; }
+    .reveal-right.visible { opacity:1; transform:translateX(0); }
+
+    /* ══════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 64px;
+      background: rgba(15,10,30,.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      transition: all .3s;
+    }
+    nav.scrolled { height: 56px; background: rgba(15,10,30,.97); }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 17px; font-weight: 800;
+      text-decoration: none;
+      background: linear-gradient(90deg, #ec4899, #8b5cf6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      color: rgba(255,255,255,.7); font-size: 14px; font-weight: 500;
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta {
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: #fff !important; padding: 9px 20px; border-radius: 50px;
+      font-size: 13px !important; font-weight: 700 !important;
+      text-decoration: none; transition: all .25s;
+      box-shadow: 0 4px 16px rgba(139,92,246,.4);
+      animation: pulse 2.5s infinite;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139,92,246,.5); }
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+    .hamburger span { display:block; width:24px; height:2px; background:white; border-radius:2px; transition:.3s; }
+
+    /* ══════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      background: var(--grad-hero);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden; padding: 100px 24px 80px;
+    }
+
+    /* Animated mesh bg */
+    .hero-mesh {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .mesh-blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: .35;
+    }
+    .blob1 { width:600px; height:600px; background:#7c3aed; top:-150px; left:-150px; animation: float 8s ease-in-out infinite; }
+    .blob2 { width:400px; height:400px; background:#ec4899; top:20%; right:-100px; animation: float2 10s ease-in-out infinite; }
+    .blob3 { width:300px; height:300px; background:#14b8a6; bottom:-80px; left:30%; animation: float 12s ease-in-out infinite reverse; }
+
+    /* Star particles */
+    .stars { position:absolute; inset:0; pointer-events:none; }
+    .star {
+      position:absolute; width:2px; height:2px; background:white; border-radius:50%;
+      animation: fadeIn 1s ease forwards, float 4s ease-in-out infinite;
+      opacity:.6;
+    }
+
+    /* Grid lines */
+    .hero-grid {
+      position:absolute; inset:0; pointer-events:none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    .hero-content {
+      position:relative; z-index:2; text-align:center; max-width:800px;
+    }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      background: rgba(236,72,153,.15); border: 1px solid rgba(236,72,153,.4);
+      color:#f9a8d4; font-size:13px; font-weight:600;
+      padding:8px 20px; border-radius:50px; margin-bottom:28px;
+      animation: fadeUp .8s ease forwards;
+    }
+    .badge-dot { width:8px; height:8px; background:#ec4899; border-radius:50%; animation: pulse 2s infinite; }
+
+    .hero h1 {
+      font-size: clamp(30px, 6vw, 58px);
+      font-weight: 800; color: #fff;
+      line-height: 1.15; margin-bottom: 22px;
+      animation: fadeUp .8s .1s ease both;
+    }
+    .hero h1 .gradient-text {
+      background: linear-gradient(90deg, #ec4899, #a78bfa, #60a5fa);
+      background-size: 200% 200%;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradMove 3s ease infinite;
+    }
+    .hero-sub {
+      font-size: clamp(15px, 2.5vw, 18px);
+      color: rgba(255,255,255,.7);
+      max-width: 600px; margin: 0 auto 40px;
+      line-height: 1.7;
+      animation: fadeUp .8s .2s ease both;
+    }
+
+    .hero-btns {
+      display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+      animation: fadeUp .8s .3s ease both;
+    }
+    .btn-hero-primary {
+      display:inline-flex; align-items:center; gap:8px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color:#fff; padding:16px 34px; border-radius:50px;
+      font-size:16px; font-weight:700; text-decoration:none;
+      transition:all .25s;
+      box-shadow:0 8px 32px rgba(139,92,246,.5);
+    }
+    .btn-hero-primary:hover { transform:translateY(-3px); box-shadow:0 16px 48px rgba(139,92,246,.6); }
+    .btn-hero-ghost {
+      display:inline-flex; align-items:center; gap:8px;
+      border:1.5px solid rgba(255,255,255,.25); color:rgba(255,255,255,.85);
+      padding:16px 28px; border-radius:50px;
+      font-size:15px; font-weight:600; text-decoration:none;
+      backdrop-filter:blur(8px);
+      transition:all .25s;
+    }
+    .btn-hero-ghost:hover { border-color:rgba(255,255,255,.6); color:#fff; background:rgba(255,255,255,.08); }
+
+    .hero-note {
+      margin-top:20px; font-size:13px; color:rgba(255,255,255,.45);
+      animation: fadeUp .8s .4s ease both;
+    }
+    .hero-note span { color:rgba(255,255,255,.65); }
+
+    /* Floating cards around hero */
+    .hero-float-cards {
+      position:absolute; inset:0; pointer-events:none;
+    }
+    .float-card {
+      position:absolute; background:rgba(255,255,255,.08);
+      backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.12);
+      border-radius:16px; padding:14px 18px;
+      font-size:13px; color:rgba(255,255,255,.85);
+      font-weight:500; white-space:nowrap;
+    }
+    .fc1 { top:20%; left:5%; animation: float 6s ease-in-out infinite; }
+    .fc2 { top:35%; right:5%; animation: float2 8s ease-in-out infinite; }
+    .fc3 { bottom:25%; left:8%; animation: float 7s ease-in-out infinite reverse; }
+    .fc4 { bottom:30%; right:8%; animation: float2 9s ease-in-out infinite reverse; }
+
+    /* ── TICKER ── */
+    .ticker {
+      background:rgba(139,92,246,.15); border-top:1px solid rgba(139,92,246,.2);
+      border-bottom:1px solid rgba(139,92,246,.2);
+      padding:12px 0; overflow:hidden; white-space:nowrap;
+    }
+    .ticker-inner {
+      display:inline-flex; gap:0;
+      animation: tickerScroll 25s linear infinite;
+    }
+    .ticker-item {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:0 32px; font-size:13px; font-weight:600;
+      color:rgba(255,255,255,.7);
+    }
+    .ticker-dot { width:6px; height:6px; background:#ec4899; border-radius:50%; }
+
+    /* ══════════════════════════════════════════
+       SOCIAL PROOF STRIP
+    ══════════════════════════════════════════ */
+    .stats-strip {
+      background: var(--white);
+      padding: 40px 24px;
+      display:flex; justify-content:center; gap:60px; flex-wrap:wrap;
+      border-bottom:1px solid var(--border);
+    }
+    .stat { text-align:center; }
+    .stat-num {
+      font-size: 36px; font-weight:800; line-height:1;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .stat-label { font-size:13px; color:var(--muted); margin-top:6px; }
+
+    /* ══════════════════════════════════════════
+       SECTIONS COMMON
+    ══════════════════════════════════════════ */
+    section { padding:80px 24px; }
+    .container { max-width:1000px; margin:0 auto; }
+    .section-center { text-align:center; }
+
+    .chip {
+      display:inline-block;
+      background:linear-gradient(135deg,rgba(236,72,153,.12),rgba(139,92,246,.12));
+      border:1px solid rgba(139,92,246,.2); color:var(--purple);
+      font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+      padding:6px 16px; border-radius:50px; margin-bottom:16px;
+    }
+    h2 { font-size:clamp(24px,4.5vw,38px); font-weight:800; line-height:1.2; margin-bottom:14px; }
+    .subtitle { font-size:16px; color:var(--muted); max-width:580px; margin:0 auto 52px; line-height:1.7; }
+
+    /* ══════════════════════════════════════════
+       PAIN SECTION — MORPHING CARDS
+    ══════════════════════════════════════════ */
+    .pain-section { background: var(--bg); }
+    .pain-grid {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px;
+    }
+    .pain-card {
+      background:var(--white); border-radius:20px; padding:28px;
+      border:1.5px solid var(--border);
+      position:relative; overflow:hidden;
+      transition:all .3s;
+      cursor:default;
+    }
+    .pain-card::before {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,rgba(239,68,68,.05),rgba(239,68,68,.1));
+      opacity:0; transition:.3s;
+    }
+    .pain-card:hover { border-color:#fca5a5; transform:translateY(-4px); box-shadow:0 12px 40px rgba(239,68,68,.12); }
+    .pain-card:hover::before { opacity:1; }
+    .pain-icon {
+      width:52px; height:52px; background:#fff1f2; border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px; margin-bottom:16px; transition:transform .3s;
+    }
+    .pain-card:hover .pain-icon { transform:scale(1.1) rotate(-5deg); }
+    .pain-card h3 { font-size:16px; font-weight:700; color:#991b1b; margin-bottom:10px; }
+    .pain-card p  { font-size:14px; color:var(--muted); line-height:1.65; }
+
+    /* ══════════════════════════════════════════
+       FEATURES — BENTO GRID
+    ══════════════════════════════════════════ */
+    .features-section { background:var(--white); }
+    .bento {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      grid-template-rows: auto;
+      gap:16px;
+    }
+    .bento-card {
+      background: var(--grad-card);
+      border:1.5px solid rgba(139,92,246,.12);
+      border-radius:20px; padding:28px;
+      position:relative; overflow:hidden;
+      transition:all .3s;
+    }
+    .bento-card:hover { transform:translateY(-4px); box-shadow:0 16px 48px rgba(139,92,246,.15); border-color:rgba(139,92,246,.3); }
+    .bento-card.large { grid-column:span 2; }
+    .bento-card.tall  { grid-row:span 2; }
+
+    .bc-icon {
+      width:52px; height:52px; border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:26px; margin-bottom:18px;
+    }
+    .bc-pink   { background:rgba(236,72,153,.12); }
+    .bc-purple { background:rgba(139,92,246,.12); }
+    .bc-blue   { background:rgba(59,130,246,.12); }
+    .bc-teal   { background:rgba(20,184,166,.12); }
+    .bc-amber  { background:rgba(245,158,11,.12); }
+    .bc-green  { background:rgba(34,197,94,.12); }
+
+    .bento-card h3 { font-size:18px; font-weight:700; margin-bottom:10px; }
+    .bento-card p  { font-size:14px; color:var(--muted); line-height:1.65; }
+    .bento-tag {
+      display:inline-block; margin-top:14px;
+      font-size:12px; font-weight:700;
+      padding:4px 12px; border-radius:50px;
+    }
+    .tag-pink   { background:rgba(236,72,153,.1); color:#ec4899; }
+    .tag-purple { background:rgba(139,92,246,.1); color:#8b5cf6; }
+    .tag-blue   { background:rgba(59,130,246,.1); color:#3b82f6; }
+    .tag-teal   { background:rgba(20,184,166,.1); color:#14b8a6; }
+    .tag-amber  { background:rgba(245,158,11,.1); color:#d97706; }
+    .tag-green  { background:rgba(34,197,94,.1); color:#16a34a; }
+
+    /* Mini progress bar in card */
+    .mini-progress { margin-top:16px; }
+    .mini-progress label { font-size:12px; color:var(--muted); display:flex; justify-content:space-between; margin-bottom:5px; }
+    .mp-bar { height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden; }
+    .mp-fill { height:100%; border-radius:3px; transition:width 1.5s ease; }
+
+    /* ══════════════════════════════════════════
+       LIVE DEMO — ANIMATED TYPEWRITER
+    ══════════════════════════════════════════ */
+    .demo-section { background:linear-gradient(135deg,#0f0a1e,#1e1050); padding:80px 24px; }
+    .demo-wrap {
+      max-width:800px; margin:0 auto;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:24px; overflow:hidden;
+      box-shadow:0 32px 80px rgba(0,0,0,.5);
+    }
+    .demo-topbar {
+      background:rgba(255,255,255,.06); padding:14px 20px;
+      display:flex; align-items:center; gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .tb-dot { width:12px; height:12px; border-radius:50%; }
+    .tb-title { font-size:13px; color:rgba(255,255,255,.5); margin-left:4px; }
+    .tb-badge {
+      margin-left:auto; font-size:11px; font-weight:700;
+      background:rgba(34,197,94,.2); color:#4ade80;
+      padding:3px 10px; border-radius:50px;
+      display:flex; align-items:center; gap:5px;
+    }
+    .tb-badge::before { content:''; width:6px; height:6px; background:#4ade80; border-radius:50%; animation:pulse 1.5s infinite; }
+
+    .demo-body { padding:28px; }
+    .d-msg { display:flex; gap:12px; margin-bottom:20px; align-items:flex-start; }
+    .d-msg.right { flex-direction:row-reverse; }
+    .d-av {
+      width:38px; height:38px; border-radius:50%; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; font-weight:800;
+    }
+    .av-user { background:linear-gradient(135deg,#ec4899,#8b5cf6); color:white; }
+    .av-ai   { background:linear-gradient(135deg,#6366f1,#3b82f6); color:white; font-size:11px; }
+    .d-bub {
+      max-width:80%; padding:13px 18px; border-radius:16px;
+      font-size:14px; line-height:1.65;
+    }
+    .d-msg.right .d-bub { background:linear-gradient(135deg,#2d1460,#3b1d8a); color:rgba(255,255,255,.9); border-radius:16px 4px 16px 16px; }
+    .d-msg:not(.right) .d-bub { background:rgba(255,255,255,.07); color:rgba(255,255,255,.85); border:1px solid rgba(255,255,255,.1); border-radius:4px 16px 16px 16px; }
+    .d-time { font-size:11px; color:rgba(255,255,255,.3); margin-top:5px; }
+    .d-msg.right .d-time { text-align:right; }
+    .d-bub strong { color:#a78bfa; }
+    .d-bub .highlight { background:rgba(139,92,246,.2); padding:2px 6px; border-radius:4px; color:#c4b5fd; }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display:flex; align-items:center; gap:10px;
+      padding:14px 20px 0;
+    }
+    .typing-dots { display:flex; gap:5px; }
+    .typing-dots span {
+      width:8px; height:8px; background:rgba(255,255,255,.3); border-radius:50%;
+      animation: fadeIn .6s ease infinite alternate;
+    }
+    .typing-dots span:nth-child(2){ animation-delay:.2s; }
+    .typing-dots span:nth-child(3){ animation-delay:.4s; }
+    .typing-label { font-size:12px; color:rgba(255,255,255,.4); }
+
+    /* ══════════════════════════════════════════
+       PROCESS STEPS
+    ══════════════════════════════════════════ */
+    .process-section { background:var(--bg); }
+    .steps {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0;
+      position:relative; max-width:860px; margin:0 auto;
+    }
+    .steps::before {
+      content:''; position:absolute; top:36px; left:10%; right:10%; height:2px;
+      background:linear-gradient(90deg,#ec4899,#8b5cf6,#6366f1,#14b8a6);
+      border-radius:2px;
+    }
+    .step { text-align:center; padding:0 20px; position:relative; }
+    .step-num {
+      width:72px; height:72px; border-radius:50%; margin:0 auto 20px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:24px; font-weight:800; color:white;
+      position:relative; z-index:1;
+      transition:transform .3s;
+    }
+    .step:hover .step-num { transform:scale(1.1); }
+    .sn1 { background:linear-gradient(135deg,#ec4899,#f472b6); box-shadow:0 8px 24px rgba(236,72,153,.4); }
+    .sn2 { background:linear-gradient(135deg,#8b5cf6,#a78bfa); box-shadow:0 8px 24px rgba(139,92,246,.4); }
+    .sn3 { background:linear-gradient(135deg,#6366f1,#818cf8); box-shadow:0 8px 24px rgba(99,102,241,.4); }
+    .sn4 { background:linear-gradient(135deg,#14b8a6,#2dd4bf); box-shadow:0 8px 24px rgba(20,184,166,.4); }
+    .step h3 { font-size:16px; font-weight:700; margin-bottom:8px; }
+    .step p  { font-size:13px; color:var(--muted); line-height:1.6; }
+
+    /* ══════════════════════════════════════════
+       BEFORE / AFTER
+    ══════════════════════════════════════════ */
+    .ba-section { background:var(--white); }
+    .ba-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:820px; margin:0 auto; }
+    .ba-card { border-radius:20px; padding:28px; }
+    .ba-before {
+      background:#fff1f2; border:1.5px solid #fecdd3;
+    }
+    .ba-after {
+      background:linear-gradient(135deg,#fdf4ff,#f0f9ff);
+      border:1.5px solid rgba(139,92,246,.2);
+    }
+    .ba-label {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:13px; font-weight:700; margin-bottom:16px;
+      padding:5px 14px; border-radius:50px;
+    }
+    .ba-before .ba-label { background:#fecdd3; color:#9f1239; }
+    .ba-after  .ba-label { background:rgba(139,92,246,.12); color:#7c3aed; }
+    .ba-item { display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; font-size:14px; color:var(--text); }
+    .ba-item .ico { font-size:16px; flex-shrink:0; margin-top:1px; }
+
+    /* ══════════════════════════════════════════
+       TESTIMONIALS — MASONRY STYLE
+    ══════════════════════════════════════════ */
+    .testimonials-section { background:var(--bg); }
+    .masonry {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:20px; align-items:start;
+    }
+    .t-card {
+      background:var(--white); border-radius:20px; padding:24px;
+      border:1.5px solid var(--border);
+      transition:all .3s; position:relative; overflow:hidden;
+    }
+    .t-card:hover { transform:translateY(-4px); box-shadow:0 16px 48px rgba(139,92,246,.12); border-color:rgba(139,92,246,.2); }
+    .t-card::after {
+      content:'"'; position:absolute; bottom:-10px; right:16px;
+      font-size:80px; line-height:1;
+      background:linear-gradient(135deg,#ec4899,#8b5cf6);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      font-family:Georgia, serif; opacity:.15;
+    }
+    .t-stars { margin-bottom:12px; }
+    .t-star { color:#f59e0b; font-size:16px; }
+    .t-text { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:18px; font-style:italic; }
+    .t-author { display:flex; align-items:center; gap:12px; }
+    .t-av {
+      width:42px; height:42px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:15px; font-weight:800; color:white; flex-shrink:0;
+    }
+    .t-name  { font-size:14px; font-weight:700; color:var(--text); }
+    .t-role  { font-size:12px; color:var(--muted); }
+    .t-badge {
+      position:absolute; top:18px; right:18px;
+      font-size:11px; font-weight:700;
+      background:rgba(34,197,94,.1); color:#16a34a;
+      padding:3px 10px; border-radius:50px;
+    }
+
+    /* ══════════════════════════════════════════
+       PRICING / CTA
+    ══════════════════════════════════════════ */
+    .cta-section {
+      background:linear-gradient(135deg,#0f0a1e,#1e1050,#2d1460);
+      padding:80px 24px; text-align:center; position:relative; overflow:hidden;
+    }
+    .cta-section::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%,rgba(236,72,153,.25) 0%,transparent 60%);
+    }
+    .cta-section h2 { color:white; position:relative; }
+    .cta-section .subtitle { color:rgba(255,255,255,.55); }
+
+    .pricing-card {
+      max-width:460px; margin:0 auto;
+      background:rgba(255,255,255,.07);
+      backdrop-filter:blur(16px);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:28px; padding:40px 36px;
+      position:relative; overflow:hidden;
+    }
+    .pricing-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg,#ec4899,#8b5cf6,#6366f1);
+    }
+    .pricing-badge-top {
+      position:absolute; top:-1px; left:50%; transform:translateX(-50%);
+      background:linear-gradient(135deg,#ec4899,#8b5cf6);
+      color:white; font-size:12px; font-weight:700;
+      padding:4px 20px; border-radius:0 0 12px 12px;
+    }
+    .price-label { font-size:13px; color:rgba(255,255,255,.5); margin-bottom:8px; }
+    .price-big {
+      font-size:52px; font-weight:800; color:white; line-height:1;
+      margin-bottom:6px;
+    }
+    .price-big sub { font-size:20px; font-weight:400; color:rgba(255,255,255,.6); }
+    .price-note { font-size:13px; color:rgba(255,255,255,.4); margin-bottom:28px; }
+
+    .perks { text-align:left; margin-bottom:28px; }
+    .perk {
+      display:flex; align-items:center; gap:12px;
+      padding:9px 0; border-bottom:1px solid rgba(255,255,255,.06);
+      font-size:14px; color:rgba(255,255,255,.8);
+    }
+    .perk:last-child { border:none; }
+    .perk-check {
+      width:22px; height:22px; border-radius:50%;
+      background:linear-gradient(135deg,#ec4899,#8b5cf6);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; flex-shrink:0;
+    }
+
+    .btn-main {
+      display:block; width:100%;
+      background:linear-gradient(135deg,#ec4899,#8b5cf6);
+      color:white; padding:17px; border-radius:14px;
+      font-size:16px; font-weight:700; text-decoration:none;
+      text-align:center; transition:all .25s;
+      box-shadow:0 8px 32px rgba(139,92,246,.4);
+    }
+    .btn-main:hover { transform:translateY(-2px); box-shadow:0 16px 48px rgba(139,92,246,.5); }
+    .guarantee { margin-top:14px; font-size:12px; color:rgba(255,255,255,.35); }
+
+    /* ══════════════════════════════════════════
+       FAQ
+    ══════════════════════════════════════════ */
+    .faq-section { background:var(--white); }
+    .faq-wrap { max-width:720px; margin:0 auto; }
+    .faq-item {
+      border-bottom:1px solid var(--border);
+      overflow:hidden;
+    }
+    .faq-q {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 0; cursor:pointer;
+      font-size:16px; font-weight:700; color:var(--text);
+      user-select:none; transition:color .2s;
+    }
+    .faq-q:hover { color:var(--purple); }
+    .faq-q .faq-icon {
+      width:28px; height:28px; border-radius:50%; flex-shrink:0;
+      background:linear-gradient(135deg,rgba(236,72,153,.1),rgba(139,92,246,.1));
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px; font-weight:400; color:var(--purple);
+      transition:transform .3s;
+    }
+    .faq-item.open .faq-icon { transform:rotate(45deg); }
+    .faq-a {
+      max-height:0; overflow:hidden; transition:max-height .4s ease;
+      font-size:14px; color:var(--muted); line-height:1.75;
+    }
+    .faq-a-inner { padding:0 0 20px; }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer {
+      background:var(--dark);
+      padding:48px 24px 32px;
+    }
+    .footer-inner { max-width:960px; margin:0 auto; }
+    .footer-top {
+      display:grid; grid-template-columns:2fr 1fr 1fr; gap:40px;
+      padding-bottom:32px; border-bottom:1px solid rgba(255,255,255,.08);
+      margin-bottom:24px;
+    }
+    .footer-logo-txt {
+      font-size:20px; font-weight:800; margin-bottom:12px;
+      background:linear-gradient(90deg,#ec4899,#8b5cf6);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .footer-desc { font-size:13px; color:rgba(255,255,255,.4); line-height:1.7; }
+    .footer-col h4 { font-size:13px; font-weight:700; color:rgba(255,255,255,.7); margin-bottom:14px; }
+    .footer-col a {
+      display:block; font-size:13px; color:rgba(255,255,255,.4);
+      text-decoration:none; margin-bottom:8px; transition:color .2s;
+    }
+    .footer-col a:hover { color:rgba(255,255,255,.8); }
+    .footer-bottom { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+    .footer-copy { font-size:12px; color:rgba(255,255,255,.3); }
+    .footer-disclaimer { font-size:11px; color:rgba(255,255,255,.25); max-width:500px; line-height:1.5; }
+
+    /* ── FLOATING CTA ── */
+    .float-cta {
+      position:fixed; bottom:24px; right:24px; z-index:999;
+      display:flex; align-items:center; gap:10px;
+      background:linear-gradient(135deg,#ec4899,#8b5cf6);
+      color:white; padding:14px 22px; border-radius:50px;
+      font-size:14px; font-weight:700; text-decoration:none;
+      box-shadow:0 8px 32px rgba(139,92,246,.5);
+      animation: pulse 2.5s infinite;
+      transition:transform .2s;
+    }
+    .float-cta:hover { transform:translateY(-3px); }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media(max-width:768px){
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .fc1,.fc2,.fc3,.fc4 { display:none; }
+      .bento { grid-template-columns:1fr; }
+      .bento-card.large { grid-column:span 1; }
+      .steps::before { display:none; }
+      .ba-grid { grid-template-columns:1fr; }
+      .footer-top { grid-template-columns:1fr; gap:28px; }
+    }
+    @media(max-width:480px){
+      .stats-strip { gap:28px; }
+      .pricing-card { padding:28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">✨ AI Hành Chính</a>
+  <div class="nav-links">
+    <a href="#tinh-nang">Tính năng</a>
+    <a href="#demo">Demo</a>
+    <a href="#bang-gia">Bảng giá</a>
+    <a href="https://app.hanhchinh.ai.vn/?ref=AFFILIATE_CODE" class="nav-cta" target="_blank">Dùng thử miễn phí →</a>
+  </div>
+  <div class="hamburger" onclick="this.classList.toggle('active')">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ══ FLOATING CTA ══ -->
+<a href="https://app.hanhchinh.ai.vn/?ref=AFFILIATE_CODE" class="float-cta" target="_blank">
+  ✨ Dùng thử 7 ngày miễn phí
+</a>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="home">
+  <div class="hero-mesh">
+    <div class="mesh-blob blob1"></div>
+    <div class="mesh-blob blob2"></div>
+    <div class="mesh-blob blob3"></div>
+  </div>
+  <div class="hero-grid"></div>
+  <div class="stars" id="stars"></div>
+
+  <!-- Floating cards -->
+  <div class="hero-float-cards">
+    <div class="float-card fc1">📝 Biên bản họp — 2 phút</div>
+    <div class="float-card fc2">✅ Chuẩn Nghị định 30</div>
+    <div class="float-card fc3">🔔 Thông báo nội bộ tự động</div>
+    <div class="float-card fc4">📅 Lịch công tác tuần</div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      Dành riêng cho Thư ký & Trợ lý Giám đốc
+    </div>
+
+    <h1>
+      Tạo biên bản họp<br/>
+      <span class="gradient-text">chuẩn thể thức trong 2 phút</span><br/>
+      — AI làm cho bạn
+    </h1>
+
+    <p class="hero-sub">
+      Không còn mất cả buổi để ghi chép, soạn thảo và căn chỉnh thể thức.
+      AI Hành Chính hiểu nghiệp vụ thư ký Việt Nam — biên bản họp, thông báo, lịch công tác hoàn chỉnh ngay lập tức.
+    </p>
+
+    <div class="hero-btns">
+      <a href="https://app.hanhchinh.ai.vn/?ref=AFFILIATE_CODE" class="btn-hero-primary" target="_blank">
+        ✨ Bắt đầu miễn phí ngay
+      </a>
+      <a href="#demo" class="btn-hero-ghost">
+        🎬 Xem demo thực tế
+      </a>
+    </div>
+
+    <p class="hero-note">
+      <span>✓ Miễn phí 7 ngày</span> &nbsp;·&nbsp;
+      <span>✓ Không cần thẻ tín dụng</span> &nbsp;·&nbsp;
+      <span>✓ Chuẩn Nghị định 30</span>
+    </p>
+  </div>
+</section>
+
+<!-- ══ TICKER ══ -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <span class="ticker-item"><div class="ticker-dot"></div>Biên bản họp tự động</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Thông báo nội bộ</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Quyết định ban hành</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Lịch công tác tuần</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Giấy mời họp</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Báo cáo tổng hợp</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Công văn chuẩn thể thức</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Tóm tắt cuộc họp</span>
+    <!-- Duplicate for seamless loop -->
+    <span class="ticker-item"><div class="ticker-dot"></div>Biên bản họp tự động</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Thông báo nội bộ</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Quyết định ban hành</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Lịch công tác tuần</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Giấy mời họp</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Báo cáo tổng hợp</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Công văn chuẩn thể thức</span>
+    <span class="ticker-item"><div class="ticker-dot"></div>Tóm tắt cuộc họp</span>
+  </div>
+</div>
+
+<!-- ══ STATS ══ -->
+<div class="stats-strip">
+  <div class="stat reveal">
+    <div class="stat-num" data-target="20000">0</div>
+    <div class="stat-label">Người dùng hàng ngày</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-num">80%</div>
+    <div class="stat-label">Giảm thời gian soạn thảo</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-num">2 phút</div>
+    <div class="stat-label">Tạo biên bản họp hoàn chỉnh</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-num">Cấp độ 3</div>
+    <div class="stat-label">An toàn thông tin quốc gia</div>
+  </div>
+</div>
+
+<!-- ══ PAIN ══ -->
+<section class="pain-section">
+  <div class="container section-center">
+    <div class="chip reveal">😩 Những nỗi đau hàng ngày</div>
+    <h2 class="reveal">Bạn có đang trải qua điều này?</h2>
+    <p class="subtitle reveal">Công việc thư ký, trợ lý tưởng đơn giản — nhưng lại ngốn hàng giờ mỗi ngày</p>
+
+    <div class="pain-grid">
+      <div class="pain-card reveal">
+        <div class="pain-icon">📝</div>
+        <h3>Biên bản họp mất cả buổi sáng</h3>
+        <p>Vừa ghi chép vừa nghe họp, sau đó gõ lại, căn chỉnh thể thức, xin duyệt — một cuộc họp 2 tiếng tốn thêm 3 tiếng làm biên bản.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">📋</div>
+        <h3>Thể thức văn bản cứ sai hoài</h3>
+        <p>Font chữ, cỡ chữ, lề trang, tiêu ngữ — quy định trong Nghị định 30 phức tạp và dễ quên, dẫn đến văn bản bị trả lại.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">🔄</div>
+        <h3>Lặp đi lặp lại mỗi tuần</h3>
+        <p>Giấy mời họp, thông báo, lịch công tác — những văn bản na ná nhau nhưng vẫn phải soạn lại từ đầu mỗi lần.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">⏰</div>
+        <h3>Làm thêm giờ vì văn bản</h3>
+        <p>Deadline biên bản cuối ngày nhưng còn hàng chục email chưa xử lý — thư ký phải ở lại sau giờ làm quá thường xuyên.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES — BENTO ══ -->
+<section class="features-section" id="tinh-nang">
+  <div class="container">
+    <div class="section-center">
+      <div class="chip reveal">✨ Tính năng nổi bật</div>
+      <h2 class="reveal">Mọi thứ thư ký cần — trong một nơi</h2>
+      <p class="subtitle reveal">Được thiết kế riêng cho nghiệp vụ thư ký và trợ lý hành chính Việt Nam</p>
+    </div>
+
+    <div class="bento">
+      <!-- Large card -->
+      <div class="bento-card large reveal">
+        <div class="bc-icon bc-pink">📝</div>
+        <h3>Biên bản họp thông minh</h3>
+        <p>Chỉ cần nhập các ý chính của cuộc họp — AI tự động hoàn thiện biên bản đầy đủ gồm thành phần tham dự, nội dung thảo luận, kết luận và ký tên. Chuẩn Nghị định 30 tuyệt đối.</p>
+        <div class="mini-progress">
+          <label><span>Thời gian tiết kiệm</span><span>80%</span></label>
+          <div class="mp-bar"><div class="mp-fill" style="width:0%; background:linear-gradient(90deg,#ec4899,#f472b6);" data-width="80"></div></div>
+        </div>
+        <span class="bento-tag tag-pink">📝 Tạo xong trong 2 phút</span>
+      </div>
+
+      <!-- Normal card -->
+      <div class="bento-card reveal">
+        <div class="bc-icon bc-purple">📅</div>
+        <h3>Lịch công tác & Giấy mời</h3>
+        <p>Tạo lịch công tác tuần, giấy mời họp chuẩn thể thức chỉ trong vài cú click. Lưu mẫu tái sử dụng cho lần sau.</p>
+        <span class="bento-tag tag-purple">♻️ Mẫu tái sử dụng</span>
+      </div>
+
+      <!-- Normal card -->
+      <div class="bento-card reveal">
+        <div class="bc-icon bc-blue">🔔</div>
+        <h3>Thông báo & Quyết định</h3>
+        <p>Soạn thông báo nội bộ, quyết định ban hành chuẩn form — không cần nhớ từng chi tiết thể thức hành chính.</p>
+        <span class="bento-tag tag-blue">✅ Chuẩn Nghị định 30</span>
+      </div>
+
+      <!-- Normal card -->
+      <div class="bento-card reveal">
+        <div class="bc-icon bc-teal">🧠</div>
+        <h3>Trợ lý AI cá nhân hóa</h3>
+        <p>Huấn luyện AI theo phong cách văn bản riêng của công ty, ngành nghề và cách làm việc của bạn.</p>
+        <span class="bento-tag tag-teal">🎯 Phù hợp 100%</span>
+      </div>
+
+      <!-- Normal card -->
+      <div class="bento-card reveal">
+        <div class="bc-icon bc-amber">📊</div>
+        <h3>Tổng hợp báo cáo</h3>
+        <p>Nhập số liệu thô → AI viết thành báo cáo định kỳ hoàn chỉnh. Báo cáo tháng xong trong 30 phút.</p>
+        <span class="bento-tag tag-amber">⚡ Nhanh hơn 70%</span>
+      </div>
+
+      <!-- Normal card -->
+      <div class="bento-card reveal">
+        <div class="bc-icon bc-green">🔒</div>
+        <h3>Bảo mật doanh nghiệp</h3>
+        <p>Nội dung cuộc họp và văn bản nội bộ được mã hóa, lưu trên server Việt Nam. ISO 27001 certified.</p>
+        <span class="bento-tag tag-green">🛡 An toàn tuyệt đối</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROCESS ══ -->
+<section class="process-section">
+  <div class="container section-center">
+    <div class="chip reveal">⚡ Quy trình 4 bước</div>
+    <h2 class="reveal">Từ ghi chép đến biên bản — chỉ 2 phút</h2>
+    <p class="subtitle reveal" style="margin-bottom:52px">Đơn giản đến mức không cần hướng dẫn</p>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num sn1">1</div>
+        <h3>Ghi nhanh ý chính</h3>
+        <p>Nhập các điểm chính của cuộc họp bằng tiếng Việt tự nhiên — không cần đúng format</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num sn2">2</div>
+        <h3>AI xử lý & soạn thảo</h3>
+        <p>AI tự động cấu trúc nội dung, thêm thể thức chuẩn, điền đầy đủ các mục bắt buộc</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num sn3">3</div>
+        <h3>Kiểm tra & chỉnh sửa</h3>
+        <p>Xem lại kết quả, chỉnh sửa nếu cần — AI học từ phản hồi của bạn</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num sn4">4</div>
+        <h3>Xuất file & gửi duyệt</h3>
+        <p>Tải xuống Word/PDF, gửi lãnh đạo ký duyệt — hoàn thành trong 2 phút</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DEMO ══ -->
+<section class="demo-section" id="demo">
+  <div class="container section-center">
+    <div class="chip reveal" style="border-color:rgba(236,72,153,.3); color:#f472b6; background:rgba(236,72,153,.1);">
+      💬 Demo thực tế
+    </div>
+    <h2 class="reveal" style="color:white;">Xem AI tạo biên bản họp ngay trước mắt bạn</h2>
+    <p class="subtitle reveal" style="color:rgba(255,255,255,.5); margin-bottom:40px;">Đây là ví dụ thực — AI thực sự hiểu nghiệp vụ thư ký Việt Nam</p>
+
+    <div class="demo-wrap reveal">
+      <div class="demo-topbar">
+        <div class="tb-dot" style="background:#ef4444"></div>
+        <div class="tb-dot" style="background:#f59e0b"></div>
+        <div class="tb-dot" style="background:#22c55e"></div>
+        <span class="tb-title">AI Hành Chính — Trợ lý Thư ký</span>
+        <div class="tb-badge">● Đang hoạt động</div>
+      </div>
+      <div class="demo-body">
+
+        <div class="d-msg right">
+          <div class="d-av av-user">TK</div>
+          <div>
+            <div class="d-bub">Tôi vừa xong cuộc họp giao ban sáng nay. Thành phần gồm GĐ Nguyễn Văn A, TP Marketing Trần Thị B, TP KT Lê C. Nội dung: triển khai chiến dịch Q3, target 500 khách mới, deadline 31/8. KT báo cáo dòng tiền ổn định. KL: Tiếp tục theo kế hoạch, họp tiếp 15/7.</div>
+            <div class="d-time" style="text-align:right">Thư ký · vừa xong</div>
+          </div>
+        </div>
+
+        <div class="d-msg">
+          <div class="d-av av-ai">AI</div>
+          <div>
+            <div class="d-bub">
+              ✅ Đã tạo <strong>Biên bản họp giao ban</strong> hoàn chỉnh. Dưới đây là bản xem trước:<br/><br/>
+              <span class="highlight">BIÊN BẢN HỌP GIAO BAN</span><br/>
+              Ngày: 08/06/2026 &nbsp;|&nbsp; Địa điểm: Phòng họp công ty<br/><br/>
+              <strong>I. THÀNH PHẦN THAM DỰ (3 người)</strong><br/>
+              • Ông Nguyễn Văn A — Giám đốc (Chủ trì)<br/>
+              • Bà Trần Thị B — Trưởng phòng Marketing<br/>
+              • Ông Lê C — Trưởng phòng Kế toán<br/><br/>
+              <strong>II. NỘI DUNG HỌP</strong><br/>
+              1. Triển khai chiến dịch kinh doanh Quý III/2026...<br/>
+              2. Báo cáo tình hình tài chính...<br/><br/>
+              <strong>III. KẾT LUẬN & PHÂN CÔNG</strong>...<br/><br/>
+              💾 Biên bản đã sẵn sàng — tải xuống Word hoặc PDF?
+            </div>
+            <div class="d-time">AI Hành Chính · 3 giây</div>
+          </div>
+        </div>
+
+        <div class="d-msg right">
+          <div class="d-av av-user">TK</div>
+          <div>
+            <div class="d-bub">Cũng tạo luôn giấy mời họp lần tới vào 15/7 nhé</div>
+            <div class="d-time" style="text-align:right">Thư ký · vừa xong</div>
+          </div>
+        </div>
+
+        <div class="typing-indicator">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="typing-label">AI Hành Chính đang soạn...</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BEFORE / AFTER ══ -->
+<section class="ba-section">
+  <div class="container section-center">
+    <div class="chip reveal">🔄 Trước & Sau</div>
+    <h2 class="reveal">Một ngày làm việc thay đổi như thế nào</h2>
+    <p class="subtitle reveal" style="margin-bottom:40px">Thư ký dùng AI Hành Chính — từ "bị ngập" sang "đã xong từ sáng"</p>
+
+    <div class="ba-grid">
+      <div class="ba-card ba-before reveal-left">
+        <div class="ba-label">😩 Trước khi dùng AI</div>
+        <div class="ba-item"><span class="ico">⏰</span>9:00 — Họp giao ban 2 tiếng, vừa nghe vừa ghi</div>
+        <div class="ba-item"><span class="ico">📝</span>11:00 — Bắt đầu soạn biên bản họp từ ghi chú lộn xộn</div>
+        <div class="ba-item"><span class="ico">😤</span>13:00 — Bị sếp nhắc "biên bản đâu rồi" sau giờ ăn trưa</div>
+        <div class="ba-item"><span class="ico">🔄</span>14:00 — Chỉnh sửa thể thức do sai font, lề trang</div>
+        <div class="ba-item"><span class="ico">😫</span>15:00 — Bắt đầu soạn thông báo tuần, giấy mời họp tiếp</div>
+        <div class="ba-item"><span class="ico">🌙</span>18:30 — Ở lại thêm để hoàn thành</div>
+      </div>
+
+      <div class="ba-card ba-after reveal-right">
+        <div class="ba-label">✨ Sau khi dùng AI Hành Chính</div>
+        <div class="ba-item"><span class="ico">📱</span>9:00 — Họp giao ban, ghi nhanh ý chính trên điện thoại</div>
+        <div class="ba-item"><span class="ico">⚡</span>11:00 — Nhập vào AI, biên bản hoàn chỉnh sau 2 phút</div>
+        <div class="ba-item"><span class="ico">✅</span>11:05 — Gửi sếp ký duyệt — xong trước bữa trưa!</div>
+        <div class="ba-item"><span class="ico">📅</span>13:30 — Tạo giấy mời họp tuần tới trong 1 phút</div>
+        <div class="ba-item"><span class="ico">📊</span>14:00 — Làm báo cáo tổng hợp tháng — AI hỗ trợ 70%</div>
+        <div class="ba-item"><span class="ico">🎉</span>17:00 — Tan làm đúng giờ, không làm thêm!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section class="testimonials-section">
+  <div class="container section-center">
+    <div class="chip reveal">💬 Người dùng thực nói gì</div>
+    <h2 class="reveal">Thư ký khắp Việt Nam đang dùng mỗi ngày</h2>
+    <p class="subtitle reveal" style="margin-bottom:48px">Phản hồi từ người dùng thực — không phải kịch bản dàn dựng</p>
+
+    <div class="masonry">
+      <div class="t-card reveal">
+        <div class="t-badge">Verified ✓</div>
+        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
+        <p class="t-text">"AI hỗ trợ tôi tóm tắt các cuộc họp và dự thảo chỉ đạo rất sát sao. Hiệu suất xử lý công việc của văn phòng tăng lên rõ rệt từ khi áp dụng. Giờ tôi chỉ mất 10 phút cho việc mà trước kia mất 2 tiếng."</p>
+        <div class="t-author">
+          <div class="t-av" style="background:linear-gradient(135deg,#ec4899,#8b5cf6)">NM</div>
+          <div>
+            <div class="t-name">Nguyễn Thị Mai</div>
+            <div class="t-role">Thư ký Giám đốc · TP.HCM</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal">
+        <div class="t-badge">Verified ✓</div>
+        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
+        <p class="t-text">"Khối lượng văn bản cần xử lý hàng ngày rất lớn. AI Hành Chính giúp tôi soạn dự thảo nhanh chóng, chuẩn Nghị định 30. Không còn phải ngồi căn chỉnh font, lề mỗi ngày nữa!"</p>
+        <div class="t-author">
+          <div class="t-av" style="background:linear-gradient(135deg,#6366f1,#3b82f6)">PT</div>
+          <div>
+            <div class="t-name">Phạm Thị Thu Hà</div>
+            <div class="t-role">Trợ lý Hành chính · Hà Nội</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="t-card reveal">
+        <div class="t-badge">Verified ✓</div>
+        <div class="t-stars"><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span><span class="t-star">★</span></div>
+        <p class="t-text">"Sản phẩm được xây dựng phù hợp với đặc thù hành chính công Việt Nam. Các biểu mẫu thường xuyên được cập nhật theo quy chuẩn hiện hành. Tôi giới thiệu cho cả team dùng luôn!"</p>
+        <div class="t-author">
+          <div class="t-av" style="background:linear-gradient(135deg,#14b8a6,#06b6d4)">TS</div>
+          <div>
+            <div class="t-name">Trần Thanh Sơn</div>
+            <div class="t-role">Văn thư · Đồng Nai</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA / PRICING ══ -->
+<section class="cta-section" id="bang-gia">
+  <div class="container">
+    <div class="chip reveal" style="border-color:rgba(236,72,153,.3); color:#f472b6; background:rgba(236,72,153,.08);">
+      🎁 Ưu đãi dùng thử
+    </div>
+    <h2 class="reveal">Bắt đầu miễn phí — thấy kết quả ngay ngày đầu</h2>
+    <p class="subtitle reveal">Không cần cài đặt, không cần thẻ tín dụng, không rủi ro</p>
+
+    <div class="pricing-card reveal">
+      <div class="pricing-badge-top">🔥 Phổ biến nhất</div>
+      <div class="price-label">Gói Thư ký & Trợ lý cá nhân</div>
+      <div class="price-big">Miễn phí <sub>7 ngày</sub></div>
+      <div class="price-note">Sau đó từ vài trăm nghìn/tháng · Hủy bất kỳ lúc nào</div>
+
+      <div class="perks">
+        <div class="perk"><div class="perk-check">✓</div>Tạo biên bản họp không giới hạn</div>
+        <div class="perk"><div class="perk-check">✓</div>10.000+ mẫu văn bản hành chính</div>
+        <div class="perk"><div class="perk-check">✓</div>Giấy mời, thông báo, lịch công tác</div>
+        <div class="perk"><div class="perk-check">✓</div>Trợ lý báo cáo tổng hợp AI</div>
+        <div class="perk"><div class="perk-check">✓</div>Trợ lý AI cá nhân hóa theo công ty</div>
+        <div class="perk"><div class="perk-check">✓</div>Bảo mật ISO 27001 — server trong nước</div>
+        <div class="perk"><div class="perk-check">✓</div>Hỗ trợ kỹ thuật 7 ngày/tuần</div>
+      </div>
+
+      <a href="https://app.hanhchinh.ai.vn/?ref=AFFILIATE_CODE" class="btn-main" target="_blank">
+        ✨ Đăng ký dùng thử miễn phí ngay →
+      </a>
+      <p class="guarantee">🔒 Cam kết bảo mật · Hủy bất kỳ lúc nào · Không ràng buộc</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section class="faq-section">
+  <div class="container">
+    <div class="section-center">
+      <div class="chip reveal">❓ Câu hỏi thường gặp</div>
+      <h2 class="reveal">Giải đáp nhanh</h2>
+    </div>
+    <div class="faq-wrap" style="margin-top:40px">
+
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          AI Hành Chính khác gì so với ChatGPT khi tạo biên bản họp?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">ChatGPT không biết thể thức hành chính Việt Nam — biên bản tạo ra thường sai format, thiếu các mục bắt buộc theo Nghị định 30. AI Hành Chính được huấn luyện chuyên biệt cho hành chính Việt Nam, tạo ra biên bản đúng chuẩn ngay lần đầu, không cần chỉnh sửa thể thức.</div></div>
+      </div>
+
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Nội dung cuộc họp của công ty tôi có bị lộ không?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Không. Dữ liệu được lưu trên server đặt tại Việt Nam (Viettel IDC, VNPT, FPT), được mã hóa đầu cuối và tuân thủ ISO 27001. Chúng tôi không sử dụng nội dung của bạn để huấn luyện AI chung. Mỗi tài khoản là một không gian riêng biệt, tuyệt đối bảo mật.</div></div>
+      </div>
+
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Thư ký mới chưa rành công nghệ có dùng được không?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Hoàn toàn dùng được. Giao diện thiết kế cho người không rành công nghệ — chỉ cần gõ tiếng Việt bình thường, hệ thống tự hiểu và xử lý. Có video hướng dẫn từng bước và hỗ trợ kỹ thuật 7 ngày/tuần nếu cần.</div></div>
+      </div>
+
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Tôi có thể dùng trên điện thoại trong lúc họp không?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Có. Giao diện web responsive, dùng tốt trên điện thoại và tablet. Bạn có thể ghi nhanh ý chính ngay trong lúc họp bằng điện thoại, sau đó tạo biên bản hoàn chỉnh ngay khi cuộc họp kết thúc.</div></div>
+      </div>
+
+      <div class="faq-item reveal">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Sau 7 ngày dùng thử, tôi cần làm gì?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a"><div class="faq-a-inner">Nếu thấy hữu ích, bạn chọn gói phù hợp để tiếp tục. Nếu không muốn tiếp tục, hủy bất kỳ lúc nào trong 7 ngày mà không bị tính phí. Không cần liên hệ, không thủ tục rắc rối — tự hủy trong tài khoản trong vài giây.</div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo-txt">✨ AI Hành Chính</div>
+        <p class="footer-desc">
+          Văn phòng AI chuyên dụng cho khối hành chính Việt Nam.<br/>
+          Phát triển bởi DIGISO & Viện AiOV.<br/><br/>
+          📍 Khu Công nghệ phần mềm ĐHQG-HCM, TP.HCM<br/>
+          📞 0877 909 606 &nbsp;·&nbsp; ✉️ info@digiso.vn
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Sản phẩm</h4>
+        <a href="https://app.hanhchinh.ai.vn/document/new" target="_blank">Soạn văn bản AI</a>
+        <a href="https://app.hanhchinh.ai.vn/assistants" target="_blank">Trợ lý AI cá nhân</a>
+        <a href="https://app.hanhchinh.ai.vn/knowledge-base" target="_blank">Kho pháp luật</a>
+        <a href="https://app.hanhchinh.ai.vn/text-to-voice" target="_blank">Audio tuyên truyền</a>
+      </div>
+      <div class="footer-col">
+        <h4>Hỗ trợ</h4>
+        <a href="https://hanhchinh.ai.vn/category/huong-dan/" target="_blank">Hướng dẫn</a>
+        <a href="https://hanhchinh.ai.vn/2026/03/31/hoi-dap-ve-ai-hanh-chinh-danh-cho-nguoi-moi/" target="_blank">Hỏi đáp</a>
+        <a href="https://hanhchinh.ai.vn/phanhoi" target="_blank">Phản hồi</a>
+        <a href="https://hanhchinh.ai.vn/category/chinh-sach/" target="_blank">Chính sách</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 AI Hành Chính · <a href="https://digiso.vn" target="_blank" style="color:rgba(255,255,255,.4)">DIGISO</a></p>
+      <p class="footer-disclaimer">⚠️ Trang này sử dụng liên kết affiliate. Khi bạn đăng ký qua link, chúng tôi nhận hoa hồng từ AI Hành Chính mà không ảnh hưởng đến giá bạn trả.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ── Generate stars ── */
+(function() {
+  const c = document.getElementById('stars');
+  if (!c) return;
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      width:${Math.random()*3+1}px;
+      height:${Math.random()*3+1}px;
+      animation-delay:${Math.random()*3}s;
+      animation-duration:${Math.random()*4+3}s;
+    `;
+    c.appendChild(s);
+  }
+})();
+
+/* ── Nav scroll ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ── Scroll reveal ── */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+      revealObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
+  .forEach(el => revealObserver.observe(el));
+
+/* ── Progress bar animation ── */
+const pbObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const fill = e.target.querySelector('.mp-fill');
+      if (fill) fill.style.width = fill.dataset.width + '%';
+      pbObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.mini-progress').forEach(el => pbObserver.observe(el));
+
+/* ── Counter animation ── */
+function animateCounter(el, target) {
+  let start = 0;
+  const step = target / 80;
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { el.textContent = target.toLocaleString('vi-VN') + '+'; clearInterval(timer); }
+    else { el.textContent = Math.floor(start).toLocaleString('vi-VN') + '+'; }
+  }, 20);
+}
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const target = +e.target.dataset.target;
+      if (target) animateCounter(e.target, target);
+      counterObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
+
+/* ── FAQ accordion ── */
+function toggleFaq(el) {
+  const item = el.parentElement;
+  const ans  = item.querySelector('.faq-a');
+  const open = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-a').style.maxHeight = null;
+  });
+  if (!open) {
+    item.classList.add('open');
+    ans.style.maxHeight = ans.scrollHeight + 'px';
+  }
+}
+
+/* ── Smooth scroll ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  });
+});
+</script>
+</body>
+</html>
